@@ -1,0 +1,49 @@
+GET http://localhost:3000
+###
+
+GET http://localhost:3000/create_table/data
+
+###
+
+POST http://localhost:3000/create_table/abcd
+
+###
+
+POST http://localhost:3000/create_record/abcd
+content-type:application/json
+
+{
+    "name": "nikhil",
+    "id":76
+}
+
+###
+
+DELETE http://localhost:3000/delete_table/abcd
+
+###
+
+DELETE http://localhost:3000/delete_record/abs/56
+
+###
+PUT http://localhost:3000/update_record/data/76
+content-type:application/json
+
+{
+    "name": "spandana"
+}
+
+###
+GET http://localhost:3000/read_table/data
+
+###
+
+GET http://localhost:3000/read_table/data/76
+
+###
+
+GET http://localhost:3000/read_table/data/lessthan/name/s
+
+###
+
+GET http://localhost:3000/read_table/data/greaterthan/name/s

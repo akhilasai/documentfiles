@@ -1,0 +1,23 @@
+User Interface: we can interact with machines.
+we 
+
+
+
+
+website
+web portal
+web application
+
+
+React?
+single page application(spa):page doesnot reloading.(index.html:we can run on single page)
+we can make dynamic spa connected to a backend through http(s) portal(one or many databases)-HTTP.
+
+prerequisties for react:
+
+-html/css-[tags,DOM(Document Object Model),properties(browser see),
+Box Model,Flex Box,Bootstrap,Sass and Less()]
+-js(ES5 N ES6)
+-Nodejs(create an environment to run JS outside the browser) using npm(node package manager)
+-Redux
+

@@ -1,0 +1,5 @@
+heroku --version
+heroku login
+heroku create name
+git push heroku master
+Procfile in vs code folder

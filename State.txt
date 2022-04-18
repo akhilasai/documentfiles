@@ -1,0 +1,11 @@
+let body
+    if(key.search('@')==true) {
+      let email=key
+      body={email,password}
+      console.log(body)
+    }
+    else{
+      let userName=key
+      body={userName,password}
+      console.log(body)
+    }

@@ -1,0 +1,12 @@
+GITHUB
+
+COMMANDS
+
+To check git we use git remote -v
+>> git init //Initilalizing git 
+>> git remote add origin https://github.com/akhilasai/APIS.git(repository link)
+>> git add .
+>> git commit -m "Backend using Mongodb"(message)
+>> git push origin master
+
+ 

@@ -1,0 +1,899 @@
+<nz-card class="nzwhitecard" *ngIf="view === 'LIST'">
+  <!-- Title -->
+  <span class="title">Template Management</span>
+  <nz-tabset [(nzSelectedIndex)]="tabIndex">
+    <!-- DRAFT TAB -->
+    <nz-tab [nzTitle]="draftTemplate" (nzClick)="tabChangeEvent('draft')">
+      <ng-template #draftTemplate>
+        Drafts
+        <nz-badge
+          *ngIf="totaldraftrecords !== '' || totaldraftrecords !== null"
+          nzCount="{{ totaldraftrecords }}"
+          class="draft-count"
+          id="draft_tab_count"
+          [nzOverflowCount]="9999"
+        >
+        </nz-badge>
+      </ng-template>
+      <!-- <nz-card> -->
+      <div nz-row class="search-row">
+        <!-- Search-->
+        <div nz-col nzSpan="8" class="search-box">
+          <i nz-icon nzType="search" class="inputsearch-icon-i"></i>
+          <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+            <input
+              type="text"
+              placeholder="Enter the Template Name"
+              [(ngModel)]="searchText"
+              (ngModelChange)="searchFilter(searchText)"
+              class="search-input"
+            />
+          </nz-input-group>
+          <ng-template class="search-icon-button" #suffixIconButton>
+            <button nz-button class="search-icon" (click)="getSearchedData()">
+              <small class="btn-search-text">Search</small>
+              <i nz-icon nzType="search" class="btn-search-icon"></i>
+            </button>
+          </ng-template>
+        </div>
+
+        <!-- Filter Button -->
+        <!-- (click)="toggleFilter()" -->
+
+        <div nz-col nzSpan="2" class="sort-button">
+          <button
+            nz-button
+            nzGhost="true"
+            nzType="primary"
+            class="filter-button"
+            (click)="toggleFilter()"
+            [ngClass]="{ 'toggle-active': showFilter }"
+          >
+            <i nz-icon nzType="filter" nzTheme="outline"></i>
+            <b class="notify" class="filter-count" *ngIf="filterCount > 0">{{ filterCount }}</b>
+            <i nz-icon nzType="down" nzTheme="outline" style="font-size: 12px; color: #4F4F4F; margin-right:5px;"></i>
+          </button>
+        </div>
+
+        <!-- Add user button -->
+        <div class="add-user" nz-col nzSpan="2" nzOffset="9">
+          <button [routerLink]="['create']" nz-button class="add-user-button">
+            <i nz-icon nzType="plus-circle" nzTheme="outline"></i>New Template
+          </button>
+        </div>
+      </div>
+
+      <hr class="horizontal-line" />
+      <div class="title-div">
+        <span class="title">Template List</span>
+        <div class="title-btn-grp">
+          <button class="expandall-btn" (click)="expandAll()">
+            <span>Expand All</span>
+          </button>
+          <span class="btn-seperater">|</span>
+          <button class="collapseall-btn" (click)="collapseAll()">
+            <span>Collapse All</span>
+          </button>
+        </div>
+      </div>
+
+      <!--filter component-->
+
+      <div class="filter-row" *ngIf="showFilter">
+        <div nz-row [nzGutter]="16">
+          <div nz-col nzSpan="10">
+            <div nz-row [nzGutter]="16">
+              <div nz-col nzSpan="6" style="text-align: end;top:4px;">
+                <span class="no-mob no-tab">Skill Tag:</span>
+              </div>
+              <div nz-col nzSpan="15" class="p-lr-0">
+                <app-multi-select-dd
+                  placeholder="Enter the Skills"
+                  [dropDownList]="this.skillsList"
+                  [selectedData]="selectedSkillFilter"
+                  (selectedList)="selectedSkillsFunc($event)"
+                ></app-multi-select-dd>
+              </div>
+            </div>
+          </div>
+          <div
+            nz-col
+            nzSpan="10"
+            [nzLg]="{ span: 10 }"
+            [nzMd]="{ span: 13 }"
+            [nzSm]="{ span: 16 }"
+            [nzXs]="{ span: 16 }"
+          >
+            <div nz-row [nzGutter]="16">
+              <div nz-col nzSpan="8" style="text-align: end;top:4px;">
+                <span class="no-mob no-tab">Created On:</span>
+              </div>
+              <div nz-col nzSpan="8">
+                <nz-date-picker
+                  [(ngModel)]="filterStartdate"
+                  nzPlaceHolder="From Date"
+                  (ngModelChange)="onStartChange($event)"
+                ></nz-date-picker>
+              </div>
+
+              <div nz-col nzSpan="8">
+                <nz-date-picker [nzDisabledDate]="disabledEndDate" [(ngModel)]="filterEnddate" nzPlaceHolder="To Date">
+                </nz-date-picker>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div nz-row style="margin-top: 15px;" [nzGutter]="16">
+          <div nz-col nzSpan="10" style="height: 50px;  top: 18px;">
+            <div nz-row [nzGutter]="16">
+              <div nz-col nzSpan="6" style="text-align: end;top:-5px;">
+                <p style="margin-right: 28px;margin-top: -6px;" class="no-mob no-tab">
+                  No. of
+                </p>
+                <p style="margin-top:-16px;" class="no-mob no-tab">
+                  Questions:
+                </p>
+              </div>
+              <div nz-col nzSpan="15">
+                <div nz-row [nzGutter]="16">
+                  <input nz-input [(ngModel)]="numofquestion" type="text" placeholder="Enter No. of Questions" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div nz-col nzSpan="10">
+            <div nz-row [nzGutter]="16">
+              <div nz-col nzSpan="8" style="text-align: end; height: 50px;  top: 10px;">
+                <p style="margin-right: 19px;margin-top: -6px;" class="no-mob no-tab">
+                  No. of
+                </p>
+                <p style="margin-top:-16px;" class="no-mob no-tab">
+                  Sections:
+                </p>
+              </div>
+              <div nz-col nzSpan="8">
+                <span class="no-mob no-tab">Min.Option</span>
+                <div nz-row [nzGutter]="16" class="m-lr-0">
+                  <input nz-input [(ngModel)]="valuemini" type="text" placeholder="0" />
+                </div>
+              </div>
+              <div nz-col nzSpan="8">
+                <span class="no-mob no-tab">Max.Option</span>
+                <div nz-row [nzGutter]="16" class="m-lr-0">
+                  <input nz-input [(ngModel)]="valuemax" type="text" placeholder="0" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- <div nz-row>
+          <div nz-col nzSpan="4"> -->
+        <div nz-row [nzGutter]="16" style="text-align : end; margin-top: 15px;">
+          <button nzShape="round" nz-button nzType="default" (click)="cancel()" class="resetBtn" id="cancel_button_ass">
+            Reset
+          </button>
+
+          <button
+            nzShape="round"
+            class="buttonTheme"
+            nz-button
+            nzType="primary"
+            (click)="callFilter()"
+            id="apply_filter_button"
+            style="margin-left : 10px;"
+          >
+            Apply
+          </button>
+        </div>
+        <!-- </div>
+        </div> -->
+      </div>
+      <div class="mobile" >
+      <nz-collapse>
+        <nz-collapse-panel
+          *ngFor="let data of listOfData"
+          [nzHeader]="data.catalogueTitle "
+          [nzActive]="data.active"
+          [nzExtra]="extraTpl"
+          [nzExtra]="extraTplt"
+          [nzDisabled]="data.disabled"
+        >
+
+                  <div class="nz-row">
+                    <span class="td-mobile-title">No.of Sections</span>
+                    <span class="td-mobile-title">Created on </span><br>
+                    <span>{{ data.createdAt | date: 'dd, MMM yyyy' }}</span>
+                  </div>
+                <!-- <div class="mob-tr-icons">
+                  <p class="action-icons">
+                    <i nz-icon nzType="edit" nzTheme="outline" (click)="editSkill(data)"></i>
+                    <i nz-icon nzType="delete" nzTheme="outline" (click)="showdraftdeleteConfirm(data)"></i>
+                    <img class="publish-icon-img" src="../../../assets/images/publish.svg"
+                    />
+                  </p>
+                </div> -->
+        </nz-collapse-panel>
+      </nz-collapse>
+      <ng-template #extraTpl>
+        <!-- You can use stopPropagation if you don't want the panel to toggle -->
+        <!-- <i nz-icon nzType="setting" (click)="$event.stopPropagation()"></i> -->
+        <i nz-icon nzType="down" nzTheme="outline"></i>
+      </ng-template>
+    </div>
+      <!-- Draft Table -->
+      <div class="skill-table toggle-table">
+        <nz-table #basicTable [nzData]="listOfData" [nzLoading]="loading" [nzShowPagination]="false">
+          <thead (nzSortChange)="sort($event)" nzSingleSort>
+            <tr>
+              <th class="vacancy-name" nzShowSort nzSortKey="catalogueTitle">Template Name</th>
+              <th class="endDate" nzShowSort nzSortKey="totalSectionCount">No. of Sections</th>
+              <th class="createdOn" nzShowSort nzSortKey="createdAt">Created On</th>
+              <th class="actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--Draft-Table-->
+            <ng-container *ngIf="listOfData.length === 0">
+              <tr>
+                <td class="text-center" colspan="5">
+                  <img src="../../../assets/images/templateIllustrator.svg" class="illustrator my-5" />
+                  <div>Click on "New Template" to create template!</div>
+                </td>
+              </tr>
+            </ng-container>
+            <ng-container *ngIf="listOfData.length !== 0">
+              <ng-container *ngFor="let data of listOfData">
+                <tr>
+                  <td class="title-text-left tooltip" style="width:425px;">
+                    <span class="limit-text">{{ data.catalogueTitle }}</span>
+                    <span class="temptooltiptop temptooltiptext">{{ data.catalogueTitle }}</span>
+                  </td>
+                  <td class="title-text-left ">
+                    <div class="tooltip">
+                      <span
+                        ><span>{{ data.sections.length }}</span>
+                        <span
+                          style="left: 10px;
+                        position: relative;
+                        top: 4px;"
+                          ><svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 14 14"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M6.71528 0.0671856C6.89443 -0.0223952 7.1053 -0.0223952 7.28445 0.0671856L13.648 3.24914C13.8635 3.35694 13.9997 3.5773 13.9997 3.81834C13.9997 4.05939 13.8635 4.27975 13.648 4.38755L7.28445 7.5695C7.1053 7.65908 6.89443 7.65908 6.71528 7.5695L0.351766 4.38755C0.136181 4.27975 0 4.05939 0 3.81834C0 3.5773 0.136181 3.35694 0.351766 3.24914L6.71528 0.0671856ZM2.05928 3.81834L6.99986 6.28879L11.9404 3.81834L6.99986 1.3479L2.05928 3.81834Z"
+                              fill="#242525"
+                            />
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M0.0673207 9.89709C0.224493 9.58273 0.606731 9.45531 0.921075 9.61249L7 12.6521L13.0789 9.61249C13.3933 9.45531 13.7755 9.58273 13.9327 9.89709C14.0899 10.2115 13.9624 10.5937 13.6481 10.7509L7.28458 13.9329C7.10543 14.0224 6.89457 14.0224 6.71542 13.9329L0.351906 10.7509C0.0375619 10.5937 -0.0898511 10.2115 0.0673207 9.89709Z"
+                              fill="#242525"
+                            />
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M0.0673207 6.71374C0.224493 6.39938 0.606731 6.27196 0.921075 6.42914L7 9.46879L13.0789 6.42914C13.3933 6.27196 13.7755 6.39938 13.9327 6.71374C14.0899 7.02811 13.9624 7.41037 13.6481 7.56755L7.28458 10.7495C7.10543 10.8391 6.89457 10.8391 6.71542 10.7495L0.351906 7.56755C0.0375619 7.41037 -0.0898511 7.02811 0.0673207 6.71374Z"
+                              fill="#242525"
+                            />
+                          </svg>
+                        </span>
+                      </span>
+
+                      <div class="desctooltipright desctooltiptext">
+                        <div class="first-row" *ngFor="let section of data.sections">
+                          <pre
+                            class="row-1"
+                          ><span class="limit-text-section">{{ section.sectionTitle }}</span>  <span class="right">Total question = {{ data.totalQuestionCount }}</span> </pre>
+                          <pre
+                            class="row-2"
+                            *ngFor="
+                              let pattern of section.pattern
+                            ">{{ pattern?.topic?.topicName }}  <span class="right">  Easy:{{ pattern.questionTotalCounts.easy }} <span class="separate">|</span> Medium:{{
+                          pattern.questionTotalCounts.medium
+                        }} <span class="separate">|</span> Hard:{{ pattern.questionTotalCounts.hard }}</span></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="title-text-left">{{ data.createdAt | date: 'dd, MMM yyyy' }}</td>
+
+                  <td>
+                    <div class="action-icons">
+                      <i
+                        nz-icon
+                        nzType="edit"
+                        nzTheme="outline"
+                        nzTooltipTitle="Edit"
+                        nzTooltipPlacement="right"
+                        nz-tooltip
+                        class="tooltip icon-class"
+                        (click)="editSkill(data)"
+                        ><span class="tooltipleft tooltiptext customTooltipEdit">Edit</span></i
+                      >
+                      <i
+                        nz-icon
+                        nzType="copy"
+                        nzTheme="outline"
+                        nzTooltipTitle="Clone"
+                        nzTooltipPlacement="right"
+                        nz-tooltip
+                        class="tooltip"
+                        (click)="cloneTemplate(data)"
+                        ><span class="tooltipleft tooltiptext customTooltipClone">Clone</span></i
+                      >
+                      <i
+                        nz-icon
+                        nzType="delete"
+                        nzTheme="outline"
+                        nzTooltipTitle="Delete"
+                        nzTooltipPlacement="right"
+                        nz-tooltip
+                        class="tooltip"
+                        (click)="showdraftdeleteConfirm(data)"
+                        ><span class="tooltipleft tooltiptext customTooltipDelete">Delete</span></i
+                      >
+
+                      <!-- <img nz-tooltip nzTooltipTitle="Publish" nzTheme="outline"
+                    nzTooltipPlacement="right"
+                        class="tooltip publish-icon-img"
+                        #publish
+                        src="../../../assets/images/publish.svg"
+                        (click)="publishCatalogue(data)"
+                    />            -->
+                      <span class="tooltip orangeimg">
+                        <img
+                          style="margin-left: 8px;"
+                          nzTooltipTitle="Publish"
+                          nzTooltipPlacement="right"
+                          nz-tooltip
+                          class="publish-icon-img"
+                          src="../../../assets/images/publish.svg"
+                          (click)="publishPopup(data._id)"
+                        /><span
+                          class="tooltipleft tooltiptext"
+                          style="width: 100px !important;line-height: 10px;right: 16px;margin-top: 2px;"
+                          >Publish
+                        </span>
+                      </span>
+                      <!--Publish Modal-->
+                      <nz-modal
+                        class="skillVacancyModal"
+                        [(nzVisible)]="isPublishVisible"
+                        [nzTitle]="modalPublishTitle"
+                        [nzContent]="modalPublishContent"
+                        [nzFooter]="modalPublishFooter"
+                        (nzOnCancel)="handleCancel()"
+                      >
+                        <ng-template #modalPublishTitle>Confirmation - Publish</ng-template>
+                        <ng-template #modalPublishContent>
+                          <span class="delete-content">Are you sure you want to publish the template?</span>
+                        </ng-template>
+                        <ng-template #modalPublishFooter>
+                          <button
+                            nz-button
+                            class="confirmsave-button"
+                            nzType="primary"
+                            (click)="publishCatalogue(data._id)"
+                            [nzLoading]="isConfirmLoading"
+                            [disabled]="popupButton"
+                          >
+                            <i nz-icon nzType="check" nzTheme="outline"></i>Confirm
+                          </button>
+                        </ng-template>
+                      </nz-modal>
+                      <!-- Draft Delete modal -->
+                      <nz-modal
+                        class="skillVacancyModal"
+                        [(nzVisible)]="isDraftDeleteVisible"
+                        [nzTitle]="modalDraftTitle"
+                        [nzContent]="modalDraftContent"
+                        [nzFooter]="modalDraftFooter"
+                        (nzOnCancel)="handleCancel()"
+                      >
+                        <ng-template #modalDraftTitle>Confirmation - Delete Template</ng-template>
+                        <ng-template #modalDraftContent>
+                          <span class="delete-content"
+                            >Are you sure you want to delete Template {{ deleteVacancyName }}?</span
+                          >
+                        </ng-template>
+                        <ng-template #modalDraftFooter>
+                          <button
+                            nz-button
+                            class="confirmsave-button"
+                            nzType="primary"
+                            (click)="deleteTemplate(templateID)"
+                            [nzLoading]="isConfirmLoading"
+                            [disabled]="popupButton"
+                          >
+                            <i nz-icon nzType="delete" nzTheme="outline"></i>Delete
+                          </button>
+                        </ng-template>
+                      </nz-modal>
+                    </div>
+                    <!-- <button nzTooltipTitle="prompt text" nzTooltipPlacement="topLeft" nz-button nz-tooltip>TL</button> -->
+                  </td>
+                </tr>
+                <tr class="tr-mobile" id="{{ data._id }}">
+                  <td colspan="4">
+                    <div class="mob-tr-row">
+                      <div class="mob-tr-date">
+                        <p class=" ">
+                          <span class="td-mobile-title">Created on </span>{{ data.createdAt | date: 'dd, MMM yyyy' }}
+                        </p>
+                        <p class="">
+                          <span class="td-mobile-title">End Date </span>{{ data.endDate | date: 'dd, MMM yyyy' }}
+                        </p>
+                      </div>
+                      <div class="mob-tr-icons">
+                        <p class="action-icons">
+                          <i nz-icon nzType="edit" nzTheme="outline" (click)="editSkill(data)"></i>
+                          <i nz-icon nzType="delete" nzTheme="outline" (click)="showdraftdeleteConfirm(data)"></i>
+                          <!-- <i nz-icon nzType="play-circle" nzTheme="outline" (click)="publishVacancy(data)"></i> -->
+                          <a (click)="publishTemplate(data)"
+                            ><img class="publish-icon-img" src="../../../assets/images/publish.svg"
+                          /></a>
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <!-- </tr> -->
+              </ng-container>
+            </ng-container>
+            <!--Draft Table end-->
+          </tbody>
+        </nz-table>
+        <!-- Draft Pagination -->
+        <div class="pagination">
+          <nz-pagination
+            (nzPageIndexChange)="pageChange($event)"
+            [nzTotal]="templateListcount"
+            [(nzPageIndex)]="pageIndex"
+            [(nzPageSize)]="pageSize"
+          ></nz-pagination>
+        </div>
+      </div>
+      <!-- </nz-card> -->
+    </nz-tab>
+
+    <!-- PUBLISH TAB -->
+
+    <nz-tab [nzTitle]="publishTemplate" (nzClick)="tabChangeEvent('published')">
+      <ng-template #publishTemplate>
+        Published
+        <nz-badge
+          *ngIf="totalpublishedrecords !== '' || totalpublishedrecords !== null"
+          class="draft-count"
+          id="draft_tab_count"
+          nzCount="{{ totalpublishedrecords }}"
+          [nzOverflowCount]="9999"
+        >
+        </nz-badge>
+      </ng-template>
+      <!-- <nz-card> -->
+      <div nz-row class="search-row">
+        <!-- Search-->
+        <div nz-col nzSpan="8" class="search-box">
+          <i nz-icon nzType="search" class="inputsearch-icon-i"></i>
+          <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+            <input
+              type="text"
+              placeholder="Enter the Template Name"
+              [(ngModel)]="searchText"
+              (ngModelChange)="searchFilter(searchText)"
+              class="search-input"
+            />
+          </nz-input-group>
+          <ng-template class="search-icon-button" #suffixIconButton>
+            <button nz-button class="search-icon" (click)="getSearchedData()">
+              <small class="btn-search-text">Search</small>
+              <i nz-icon nzType="search" class="btn-search-icon"></i>
+            </button>
+          </ng-template>
+        </div>
+
+        <!-- Filter Button -->
+        <!-- (click)="toggleFilter()" -->
+        <div nz-col nzSpan="2" class="sort-button">
+          <button
+            nz-button
+            nzGhost="true"
+            nzType="primary"
+            class="filter-button"
+            (click)="toggleFilter()"
+            [ngClass]="{ 'toggle-active': showFilter }"
+          >
+            <i nz-icon nzType="filter" nzTheme="outline"></i>
+            <b class="notify" class="filter-count" *ngIf="filterCount > 0">{{ filterCount }}</b>
+            <i nz-icon nzType="down" nzTheme="outline" style="font-size: 12px; color: #4F4F4F; margin-right:5px;"></i>
+          </button>
+        </div>
+
+        <!-- Add user button -->
+        <div class="add-user" nz-col nzSpan="2" nzOffset="9">
+          <button [routerLink]="['create']" nz-button class="add-user-button">
+            <i nz-icon nzType="plus-circle" nzTheme="outline"></i>New Template
+          </button>
+        </div>
+      </div>
+
+      <hr class="horizontal-line" />
+
+      <!--filter component-->
+      <div class="filter-row" *ngIf="showFilter">
+        <div nz-row [nzGutter]="16">
+          <div nz-col nzSpan="6">
+            <div nz-row [nzGutter]="16">
+              <div nz-col nzSpan="8" style="text-align: end;top:4px;">
+                <span>Skill Tag:</span>
+              </div>
+              <div nz-col nzSpan="16" class="p-lr-0">
+                <app-multi-select-dd
+                  placeholder="Enter the Skills"
+                  [dropDownList]="this.skillsList"
+                  [selectedData]="selectedSkillFilter"
+                  (selectedList)="selectedSkillsFunc($event)"
+                ></app-multi-select-dd>
+              </div>
+            </div>
+          </div>
+
+          <div nz-col nzSpan="8">
+            <div nz-row [nzGutter]="16">
+              <div nz-col nzSpan="7" style="text-align: end;top:4px">
+                <span>Created by:</span>
+              </div>
+              <div nz-col nzSpan="16" class="p-lr-0">
+                <nz-select
+                  style="width: 100%;"
+                  nzPlaceHolder="Select Author"
+                  nzShowSearch
+                  nzMode="multiple"
+                  [(ngModel)]="author"
+                >
+                  <nz-option *ngFor="let user of userList" [nzValue]="user.id" [nzLabel]="user.name"></nz-option>
+                </nz-select>
+              </div>
+            </div>
+          </div>
+
+          <div nz-col nzSpan="10">
+            <div nz-row [nzGutter]="16">
+              <div nz-col nzSpan="8" style="text-align: end;top:4px;width: 100px;">
+                <span>Created On:</span>
+              </div>
+              <div nz-col nzSpan="8">
+                <nz-date-picker
+                  [(ngModel)]="filterStartdate"
+                  nzPlaceHolder="From Date"
+                  (ngModelChange)="onStartChange($event)"
+                ></nz-date-picker>
+              </div>
+
+              <div nz-col nzSpan="8">
+                <nz-date-picker [nzDisabledDate]="disabledEndDate" [(ngModel)]="filterEnddate" nzPlaceHolder="To Date">
+                </nz-date-picker>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div nz-row style="margin-top: 15px;" [nzGutter]="16">
+          <div nz-col nzSpan="6" style="height: 50px;  top: 18px;">
+            <div nz-row [nzGutter]="16">
+              <div nz-col nzSpan="8" style="text-align: end;top:-4px;">
+                <p style="margin-right:28px;margin-top:-10px;">
+                  No. of
+                </p>
+                <p style="margin-top:-17px;">
+                  Questions:
+                </p>
+              </div>
+              <div nz-col nzSpan="16">
+                <div nz-row [nzGutter]="16">
+                  <input nz-input [(ngModel)]="numofquestion" type="text" placeholder="Enter No. of Questions" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div nz-col nzSpan="8">
+            <div nz-row [nzGutter]="16">
+              <div nz-col nzSpan="7" style="text-align: end; height: 50px;  top: 14px;">
+                <p style="margin-right:19px;margin-top:-10px;">
+                  No. of
+                </p>
+                <p style="margin-top: -17px;">
+                  Sections:
+                </p>
+              </div>
+              <div nz-col nzSpan="8" class="pminoption">
+                <span>Min.Option</span>
+                <div nz-row [nzGutter]="16" class="m-lr-0" style="margin-left:0px;margin-right:-8px;">
+                  <input nz-input [(ngModel)]="valuemini" type="text" placeholder="0" />
+                </div>
+              </div>
+              <div nz-col nzSpan="8" class="pmaxoption">
+                <span>Max.Option</span>
+                <div nz-row [nzGutter]="16" class="m-lr-0" style="margin-right:0px;margin-left:-8px;">
+                  <input nz-input [(ngModel)]="valuemax" type="text" placeholder="0" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div nz-row [nzGutter]="16" style="text-align : end; margin-top: 15px;">
+          <button nzShape="round" nz-button nzType="default" (click)="cancel()" class="resetBtn" id="cancel_button_ass">
+            Reset
+          </button>
+
+          <button
+            nzShape="round"
+            class="buttonTheme"
+            nz-button
+            nzType="primary"
+            (click)="callFilter()"
+            id="apply_filter_button"
+            style="margin-left : 10px;"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+      <!-- Publish Table -->
+      <div class="skill-table toggle-table">
+        <nz-table #publishTable [nzData]="listOfData" [nzLoading]="loading" [nzShowPagination]="false">
+          <thead (nzSortChange)="sort($event)" nzSingleSort>
+            <tr>
+              <th class="published-vacancy" nzShowSort nzSortKey="catalogueTitle">Template Name</th>
+              <th class="vacancy-status" nzShowSort nzSortKey="totalSectionCount">No. of Sections</th>
+              <th class="publishCreate" nzShowSort nzSortKey="createdAt">Created On</th>
+              <th class="publish-icons">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngIf="listOfData.length === 0">
+              <tr>
+                <td class="text-center" colspan="5">
+                  <img src="../../../assets/images/ca-illustrator.png" class="illustrator my-5" />
+                  <div>Click on "New Template" to Add Template!</div>
+                </td>
+              </tr>
+            </ng-container>
+            <ng-container *ngIf="listOfData.length !== 0">
+              <ng-container *ngFor="let data of listOfData">
+                <tr>
+                  <!-- <tr *ngFor="let data of basicTable.data"> -->
+                  <td class="title-text-left tooltip" style="width:425px;">
+                    <span class="limit-text">{{ data.catalogueTitle }}</span>
+                    <span class="temptooltiptop temptooltiptext">{{ data.catalogueTitle }}</span>
+                  </td>
+                  <td class="title-text-left ">
+                    <div class="tooltip">
+                      <span
+                        ><span>{{ data.sections.length }}</span>
+                        <span
+                          style="left: 10px;
+                        position: relative;
+                        top: 4px;"
+                          ><svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 14 14"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M6.71528 0.0671856C6.89443 -0.0223952 7.1053 -0.0223952 7.28445 0.0671856L13.648 3.24914C13.8635 3.35694 13.9997 3.5773 13.9997 3.81834C13.9997 4.05939 13.8635 4.27975 13.648 4.38755L7.28445 7.5695C7.1053 7.65908 6.89443 7.65908 6.71528 7.5695L0.351766 4.38755C0.136181 4.27975 0 4.05939 0 3.81834C0 3.5773 0.136181 3.35694 0.351766 3.24914L6.71528 0.0671856ZM2.05928 3.81834L6.99986 6.28879L11.9404 3.81834L6.99986 1.3479L2.05928 3.81834Z"
+                              fill="#242525"
+                            />
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M0.0673207 9.89709C0.224493 9.58273 0.606731 9.45531 0.921075 9.61249L7 12.6521L13.0789 9.61249C13.3933 9.45531 13.7755 9.58273 13.9327 9.89709C14.0899 10.2115 13.9624 10.5937 13.6481 10.7509L7.28458 13.9329C7.10543 14.0224 6.89457 14.0224 6.71542 13.9329L0.351906 10.7509C0.0375619 10.5937 -0.0898511 10.2115 0.0673207 9.89709Z"
+                              fill="#242525"
+                            />
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M0.0673207 6.71374C0.224493 6.39938 0.606731 6.27196 0.921075 6.42914L7 9.46879L13.0789 6.42914C13.3933 6.27196 13.7755 6.39938 13.9327 6.71374C14.0899 7.02811 13.9624 7.41037 13.6481 7.56755L7.28458 10.7495C7.10543 10.8391 6.89457 10.8391 6.71542 10.7495L0.351906 7.56755C0.0375619 7.41037 -0.0898511 7.02811 0.0673207 6.71374Z"
+                              fill="#242525"
+                            />
+                          </svg>
+                        </span>
+                      </span>
+
+                      <div class="desctooltipright desctooltiptext">
+                        <div class="first-row" *ngFor="let section of data.sections">
+                          <pre
+                            class="row-1"
+                          ><span class="limit-text-section">{{ section.sectionTitle }}</span>  <span class="right">Total question = {{ data.totalQuestionCount }}</span> </pre>
+                          <pre
+                            class="row-2"
+                            *ngFor="
+                              let pattern of section.pattern
+                            ">{{ pattern?.topic?.topicName }}  <span class="right">  Easy:{{ pattern.questionTotalCounts.easy }} <span class="separate">|</span> Medium:{{
+                            pattern.questionTotalCounts.medium
+                          }} <span class="separate">|</span> Hard:{{ pattern.questionTotalCounts.hard }}</span></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="title-text-left">{{ data.createdAt | date: 'dd, MMM yyyy' }}</td>
+
+                  <td>
+                    <div class="action-icons">
+                      <i
+                        nz-icon
+                        nzType="edit"
+                        nzTheme="outline"
+                        nzTooltipTitle="Edit"
+                        nzTooltipPlacement="right"
+                        nz-tooltip
+                        class="tooltip"
+                        (click)="editSkill(data)"
+                        ><span class="tooltipleft tooltiptext customTooltipEdit">Edit</span></i
+                      >
+                      <i
+                        nz-icon
+                        nzType="copy"
+                        nzTheme="outline"
+                        nzTooltipTitle="Clone"
+                        nzTooltipPlacement="right"
+                        nz-tooltip
+                        class="tooltip"
+                        (click)="cloneTemplate(data)"
+                        ><span class="tooltipleft tooltiptext customTooltipClone">Clone</span></i
+                      >
+                      <i
+                        nz-icon
+                        nzType="delete"
+                        nzTheme="outline"
+                        nzTooltipTitle="Delete"
+                        nzTooltipPlacement="right"
+                        nz-tooltip
+                        class="tooltip"
+                        (click)="showdraftdeleteConfirm(data)"
+                        ><span class="tooltipleft tooltiptext customTooltipDelete">Delete</span></i
+                      >
+                      <i
+                        nz-icon
+                        nzType="file-add"
+                        nzTheme="outline"
+                        nzTooltipTitle="Create Assessments"
+                        nzTooltipPlacement="left"
+                        nz-tooltip
+                        class="tooltip"
+                        ><span class="tooltipleft tooltiptext assessment customTooltipCreateAssessment"
+                          >Create Assessment</span
+                        ></i
+                      >
+                      <!-- Draft Delete modal -->
+                      <nz-modal
+                        class="skillVacancyModal"
+                        [(nzVisible)]="isDraftDeleteVisible"
+                        [nzTitle]="modalDraftTitle"
+                        [nzContent]="modalDraftContent"
+                        [nzFooter]="modalDraftFooter"
+                        (nzOnCancel)="handleCancel()"
+                      >
+                        <ng-template #modalDraftTitle>Confirmation - Delete Template</ng-template>
+                        <ng-template #modalDraftContent>
+                          <span class="delete-content"
+                            >Are you sure you want to delete Template {{ deleteVacancyName }}?</span
+                          >
+                        </ng-template>
+                        <ng-template #modalDraftFooter>
+                          <button
+                            nz-button
+                            class="confirmsave-button"
+                            nzType="primary"
+                            (click)="deleteTemplate(templateID)"
+                            [nzLoading]="isConfirmLoading"
+                            [disabled]="popupButton"
+                          >
+                            <i nz-icon nzType="delete" nzTheme="outline"></i>Delete
+                          </button>
+                        </ng-template>
+                      </nz-modal>
+                    </div>
+                    <!-- <button nzTooltipTitle="prompt text" nzTooltipPlacement="topLeft" nz-button nz-tooltip>TL</button> -->
+
+                    <!-- <nz-modal
+                      class="skillVacancyModal"
+                      [(nzVisible)]="isPublishVisible"
+                      [nzTitle]="modalPublishTitle"
+                      [nzContent]="modalPublishContent"
+                      [nzFooter]="modalPublishFooter"
+                      (nzOnCancel)="handleCancel()"
+                    >
+                      <ng-template #modalPublishTitle>Confirmation - Publish</ng-template>
+                      <ng-template #modalPublishContent>
+                        <span class="delete-content"
+                          >Please confirm if you want to publish.</span
+                        >
+                      </ng-template>
+                      <ng-template #modalPublishFooter>
+                        <button
+                          nz-button
+                          class="confirmsave-button"
+                          nzType="primary"
+                          (click)="publishVacancy(deleteVacancyData)"
+                          [nzLoading]="isConfirmLoading"
+                          [disabled]="popupButton"
+                        >
+                          <i nz-icon nzType="check" nzTheme="outline"></i>Confirm
+                        </button>
+                      </ng-template>
+                    </nz-modal> -->
+                  </td>
+                </tr>
+                <tr class="tr-mobile" id="{{ data._id }}">
+                  <td colspan="4">
+                    <div class="mob-tr-row">
+                      <div class="mob-tr-date">
+                        <p class=" ">
+                          <span class="td-mobile-title">Created on </span>{{ data.createdAt | date: 'dd, MMM yyyy' }}
+                        </p>
+                        <p class="">
+                          <span class="td-mobile-title">End Date </span>{{ data.endDate | date: 'dd, MMM yyyy' }}
+                        </p>
+                      </div>
+                      <div class="mob-tr-icons">
+                        <p class="action-icons">
+                          <i nz-icon nzType="edit" nzTheme="outline" (click)="editSkill(data)"></i>
+                          <i nz-icon nzType="delete" nzTheme="outline" (click)="showdraftdeleteConfirm(data)"></i>
+                          <!-- <i nz-icon nzType="play-circle" nzTheme="outline" (click)="publishVacancy(data)"></i> -->
+                          <img
+                            class="publish-icon-img"
+                            src="../../../assets/images/publish.svg"
+                            (click)="publishVacancyPopup(data)(data)"
+                          />
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <!-- </tr> -->
+              </ng-container>
+            </ng-container>
+            <!--   <ng-container *ngIf="basicTable.data.length === 0">
+              <tr>
+                <td class="text-center mt-3" colspan="5">
+                  <img src="../../../assets/images/Illustration.svg" class="illustrator" />
+                  <div>Click on "New Template" to create template!</div>
+                </td>
+              </tr>
+            </ng-container>-->
+          </tbody>
+        </nz-table>
+
+        <!-- Publish Pagination -->
+        <div class="pagination">
+          <nz-pagination
+            (nzPageIndexChange)="pageChange($event)"
+            [nzPageIndex]="pageIndex"
+            [nzTotal]="totalpublishedrecords"
+            [(nzPageIndex)]="pageIndex"
+            [(nzPageSize)]="pageSize"
+          ></nz-pagination>
+        </div>
+      </div>
+      <!-- </nz-card> -->
+    </nz-tab>
+  </nz-tabset>
+</nz-card>
+
+<!-- FORM -->
+<div *ngIf="view === 'EDIT'">
+  <app-template-create [catalogue]="selectedCatalogue" (notifyUpdate)="eventFromForm($event)"></app-template-create>
+</div>

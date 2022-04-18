@@ -1,0 +1,32 @@
+Every component in React goes through a lifecycle of events.
+ I like to think of them as going through a cycle of birth, growth, and death.
+
+Mounting – Birth of your component
+Update – Growth of your component
+Unmount – Death of your component
+
+
+Each component in React has a lifecycle which you can monitor and manipulate during its three main phases.
+
+The three phases are: Mounting, Updating, and Unmounting.
+
+Mounting:
+
+Mounting means putting elements into the DOM.
+
+render:
+
+The render() method is required, and is the method that actually outputs the HTML to the DOM.
+
+componentDidMount
+
+
+The componentDidMount() method is called after the component is rendered.
+
+componentWillMount:
+
+componentWillMount is executed before rendering, on both the server and the client side. 
+componentDidMount is executed after the first render only on the client side.
+ This is where AJAX requests and DOM or state updates should occur. ... componentWillUpdate is called just before rendering.
+
+

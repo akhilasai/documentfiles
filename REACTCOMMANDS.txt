@@ -1,0 +1,9 @@
+REACT APP
+
+Create folder 
+with npm
+>>npm creat-react-app
+>>npm init react-app name
+
+>> npx create-react-app Firstreactapp
+

@@ -1,0 +1,17 @@
+UNext
+
+dev link:https://ams-authoring-dev01.unext.tech/
+
+login credentials:
+
+ritesh.hota@u-next.com thyagarajan4u@gmail.com
+devadmin@u-next.com
+testadmin@u-next.com
+hotahota@gmail.com
+
+password:
+ Manipal@123
+
+or 
+
+Hotahota
